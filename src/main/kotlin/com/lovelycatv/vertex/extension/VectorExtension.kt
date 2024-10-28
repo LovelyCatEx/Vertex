@@ -7,6 +7,8 @@ import com.lovelycatv.vertex.math.vector.*
  * @since 2024-10-27 18:45
  * @version 1.0
  */
+class VectorExtension private constructor()
+
 fun DoubleArray.toVector(): VectorN {
     return VectorN(this.size, this)
 }

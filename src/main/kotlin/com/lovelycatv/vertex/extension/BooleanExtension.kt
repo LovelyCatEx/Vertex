@@ -5,6 +5,8 @@ package com.lovelycatv.vertex.extension
  * @since 2024-10-23 22:26
  * @version 1.0
  */
+class BooleanExtension private constructor()
+
 fun <R> Boolean?.runIfTrue(action: () -> R): R? = if (this != null && this) action() else null
 
 fun <R> Boolean?.runIfFalse(action: () -> R): R? = if (this == null || !this) action() else null

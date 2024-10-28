@@ -8,6 +8,8 @@ import kotlin.coroutines.CoroutineContext
  * @since 2024-10-27 19:11
  * @version 1.0
  */
+class CoroutineExtension private constructor()
+
 @OptIn(DelicateCoroutinesApi::class)
 fun runCoroutine(
     coroutineScope: CoroutineScope = GlobalScope,

@@ -5,6 +5,8 @@ package com.lovelycatv.vertex.extension
  * @since 2024-10-24 13:59
  * @version 1.0
  */
+class MathExtension private constructor()
+
 inline fun sigma(n: Long, k: Long = 1, fx: (n: Long) -> Double): Double {
     var sum = fx(k)
     for (i in k + 1..n) {

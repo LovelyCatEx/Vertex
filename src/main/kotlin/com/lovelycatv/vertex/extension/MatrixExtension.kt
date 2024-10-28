@@ -7,6 +7,8 @@ import com.lovelycatv.vertex.math.linear.Matrix
  * @since 2024-10-24 13:05
  * @version 1.0
  */
+class MatrixExtension private constructor()
+
 fun emptyDoubleArray(n: Int, default: Double = 0.0): DoubleArray = DoubleArray(n) { default }
 
 fun identityMatrix(n: Int): Matrix {

@@ -7,4 +7,6 @@ import com.lovelycatv.vertex.math.Complex
  * @since 2024-10-24 13:52
  * @version 1.0
  */
+class ComplexExtension private constructor()
+
 fun Double.complex(j: Double = 0.0): Complex = Complex(this, j)
