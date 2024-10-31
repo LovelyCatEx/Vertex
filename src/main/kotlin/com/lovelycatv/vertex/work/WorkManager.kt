@@ -150,7 +150,7 @@ class WorkManager {
                                 block = block,
                                 producer = block.works[finalFailedStrategies.indexOf(WorkFailureStrategy.INTERRUPT_BLOCK)]
                             )
-                            break
+                            continue
                         }
                     } else {
                         // Parallel
