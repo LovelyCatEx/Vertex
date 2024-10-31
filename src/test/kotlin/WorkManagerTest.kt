@@ -1,13 +1,10 @@
 import com.lovelycatv.vertex.work.WorkChain
-import com.lovelycatv.vertex.work.WorkData
+import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkManager
 import com.lovelycatv.vertex.work.WorkResult
-import com.lovelycatv.vertex.work.base.AbstractStateWork
-import com.lovelycatv.vertex.work.base.AbstractWork
 import com.lovelycatv.vertex.work.base.AbstractWorker
 import com.lovelycatv.vertex.work.base.WrappedWorker
 import com.lovelycatv.vertex.work.extension.WorkerBuilder
-import com.lovelycatv.vertex.work.interceptor.AbstractWorkChainInterceptor
 import com.lovelycatv.vertex.work.interceptor.DefaultWorkChainInterceptor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking

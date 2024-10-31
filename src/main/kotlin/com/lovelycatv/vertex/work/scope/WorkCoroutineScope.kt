@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.work.scope
 
 import com.lovelycatv.vertex.extension.runCoroutine
 import com.lovelycatv.vertex.extension.runCoroutineAsync
+import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkResult
 import com.lovelycatv.vertex.work.base.WrappedWorker
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeAwaitTimeoutException
@@ -36,7 +37,7 @@ class WorkCoroutineScope(
         this.checkAvailability()
         val newJob = runCoroutine(this, context) {
             try {
-                identifier.getWorker().startWork()
+                identifier.getWorker().startWork(WorkData.build())
             } catch (e: Exception) {
                 e.printStackTrace()
                 this.exceptionHandler?.invoke(identifier, e)
@@ -51,7 +52,7 @@ class WorkCoroutineScope(
         this.checkAvailability()
         val newJob = runCoroutineAsync(this, context) {
             try {
-                identifier.getWorker().startWork()
+                identifier.getWorker().startWork(WorkData.build())
             } catch (e: Exception) {
                 this.exceptionHandler?.invoke(identifier, e)
                 identifier.getWorker().getCurrentWorkResult()

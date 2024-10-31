@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.work.base
 
 import com.lovelycatv.vertex.extension.runCoroutine
-import com.lovelycatv.vertex.work.WorkData
+import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkResult
 import kotlinx.coroutines.*
 
@@ -42,8 +42,8 @@ sealed class AbstractProtectedWork(
         }
     }
 
-    override suspend fun startWork(): WorkResult {
-        val result = super.startWork()
+    override suspend fun startWork(preBlockOutputData: WorkData): WorkResult {
+        val result = super.startWork(preBlockOutputData)
         this.waitForProtectedJobs()
         return result
     }

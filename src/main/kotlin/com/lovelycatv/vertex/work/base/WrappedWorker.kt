@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.work.base
 
 import com.lovelycatv.vertex.work.RetryIntervalSupplier
-import com.lovelycatv.vertex.work.WorkData
+import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkFailureStrategy
 import com.lovelycatv.vertex.work.WorkRetryStrategy
 import kotlin.reflect.KClass

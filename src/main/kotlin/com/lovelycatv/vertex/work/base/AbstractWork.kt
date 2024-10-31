@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.work.base
 
-import com.lovelycatv.vertex.work.WorkData
+import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -16,9 +16,9 @@ sealed class AbstractWork(
 ) {
     private var lastStartedTimestamp = 0L
 
-    open suspend fun startWork(): WorkResult {
+    open suspend fun startWork(preBlockOutputData: WorkData): WorkResult {
         this.lastStartedTimestamp = System.currentTimeMillis()
-        return doWork(inputData)
+        return doWork(inputData + preBlockOutputData)
     }
 
     open suspend fun stopWork(job: Job, reason: String) {

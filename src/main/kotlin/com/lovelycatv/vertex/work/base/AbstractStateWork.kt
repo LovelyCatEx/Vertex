@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.work.base
 
-import com.lovelycatv.vertex.work.WorkData
+import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkResult
 import com.lovelycatv.vertex.work.WorkState
 import com.lovelycatv.vertex.work.exception.WorkNotCompletedException
@@ -22,12 +22,12 @@ sealed class AbstractStateWork(
 
     fun getCurrentWorkResult() = this.workResult.value
 
-    override suspend fun startWork(): WorkResult {
+    override suspend fun startWork(preBlockOutputData: WorkData): WorkResult {
         val currentState = this.getCurrentWorkResult().state
         if (currentState != WorkState.RUNNING) {
             return try {
                 postWorkResult(WorkResult(WorkState.RUNNING))
-                val result = doWork(inputData)
+                val result = super.startWork(preBlockOutputData)
                 postWorkResult(result)
                 result
             } catch (e: Exception) {

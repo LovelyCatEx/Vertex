@@ -1,5 +1,7 @@
 package com.lovelycatv.vertex.work
 
+import com.lovelycatv.vertex.work.data.WorkData
+
 /**
  * @author lovelycat
  * @since 2024-10-27 20:24
