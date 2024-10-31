@@ -83,6 +83,10 @@ abstract class AbstractWork(
         postWorkResult(WorkResult.running(output))
     }
 
+    protected fun postWorkProgress(outputData: WorkData) {
+        this.postWorkResult(WorkResult.running(outputData))
+    }
+
     protected abstract suspend fun doWork(inputData: WorkData): WorkResult
 
     private fun postWorkResult(workResult: WorkResult) {
