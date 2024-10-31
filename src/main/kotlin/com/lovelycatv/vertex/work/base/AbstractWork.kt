@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.work.base
 
+import com.lovelycatv.vertex.extension.runCoroutine
 import com.lovelycatv.vertex.work.WorkData
 import com.lovelycatv.vertex.work.WorkResult
 import com.lovelycatv.vertex.work.WorkState
@@ -14,13 +15,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * @version 1.0
  */
 abstract class AbstractWork(
-    val workId: String,
+    val workName: String,
     val inputData: WorkData = WorkData.build(),
-    private val throwException: Boolean = true,
-    private val sideCoroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val throwException: Boolean = true
 ) {
     private var lastStartedTimestamp = 0L
-    private var runningJob: Job? = null
     private val _workResultLogs = MutableStateFlow(mutableListOf<WorkResult>())
     val workResultLogs: Flow<MutableList<WorkResult>> get() = this._workResultLogs
 
@@ -28,13 +27,44 @@ abstract class AbstractWork(
         this.postWorkResult(WorkResult(WorkState.INITIALIZED))
     }
 
+    /**
+     * Protected Jobs
+     */
+    private val protectedCoroutineScope = CoroutineScope(Dispatchers.IO + Job())
+    private val protectedJobs = mutableListOf<Job>()
+
+    fun anyProtectJobsRunning(): Boolean {
+        return protectedJobs.map { it.isActive }.toSet().run {
+            this.size == 1 && this.iterator().next()
+        }
+    }
+
+    fun cancelAllProtectedJobs(reason: String) {
+        protectedJobs.filter { it.isActive }.forEach {
+            it.cancel(reason)
+        }
+    }
+
+    fun runInProtected(fx: suspend () -> Unit) {
+        val job = runCoroutine(protectedCoroutineScope) {
+            fx()
+        }
+        this.protectedJobs.add(job)
+    }
+
+    suspend fun waitForProtectedJobs() {
+        while (this.anyProtectJobsRunning()) {
+            delay(100)
+        }
+    }
+
     suspend fun startWork() {
         val currentState = this.getCurrentState()
-        if (currentState != WorkState.RUNNING && currentState != WorkState.STEP_COMPLETED) {
+        if (currentState != WorkState.RUNNING) {
             try {
                 this.lastStartedTimestamp = System.currentTimeMillis()
                 // Set initial running state
-                this@AbstractWork.postStepStarted()
+                this@AbstractWork.postWorkStarted()
                 val finalResult = doWork(this@AbstractWork.inputData)
                 this@AbstractWork.postWorkResult(finalResult)
             } catch (e: Exception) {
@@ -49,34 +79,8 @@ abstract class AbstractWork(
         }
     }
 
-    fun stopWork(reason: String = "", output: WorkData = WorkData.build(), checkDelay: Long = 10) {
-        runningJob?.let { currentJob ->
-            sideCoroutineScope.launch {
-                while (currentJob.isActive) {
-                    if (this@AbstractWork.getCurrentState() == WorkState.STEP_COMPLETED) {
-                        currentJob.cancel(reason)
-                        break
-                    }
-                    delay(checkDelay)
-                }
-                postWorkResult(WorkResult.stopped(reason, output))
-            }
-        } ?: postWorkResult(WorkResult.stopped(reason, output))
-    }
-
-    fun forceStopWork(reason: String = "", output: WorkData = WorkData.build()) {
-        if (this.getCurrentState() == WorkState.RUNNING || this.getCurrentState() == WorkState.STEP_COMPLETED) {
-            runningJob?.cancel(reason)
-            postWorkResult(WorkResult.stopped(reason, output))
-        }
-    }
-
-    protected fun postStepStarted(output: WorkData = WorkData.build()) {
+    private fun postWorkStarted(output: WorkData = WorkData.build()) {
         postWorkResult(WorkResult.running(output))
-    }
-
-    protected fun postStepCompleted(output: WorkData = WorkData.build()) {
-        postWorkResult(WorkResult.stepCompleted(output))
     }
 
     protected abstract suspend fun doWork(inputData: WorkData): WorkResult

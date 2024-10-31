@@ -7,4 +7,4 @@ import com.lovelycatv.vertex.work.base.AbstractWork
  * @since 2024-10-27 20:41
  * @version 1.0
  */
-class WorkNotCompletedException(work: AbstractWork) : RuntimeException("Work ${work.workId} is still running")
+class WorkNotCompletedException(work: AbstractWork) : RuntimeException("Work ${work.workName} is still running")

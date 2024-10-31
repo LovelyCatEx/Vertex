@@ -56,17 +56,27 @@ class WorkCoroutineScope(
         return newJob
     }
 
-    fun cancelAllTasks(reason: String = "") {
-        getActiveJobs().forEach {
-            it.key.stopWork(reason)
+    suspend fun stopCurrentWorks(reason: String = "") {
+        getActiveJobs().forEach { (work, workMainJob) ->
+            while (work.anyProtectJobsRunning()) {
+                delay(100)
+            }
+            workMainJob.cancel(reason)
+        }
+    }
+
+    fun forceStopCurrentWorks(reason: String = "") {
+        getActiveJobs().forEach { (work, workMainJob) ->
+            work.cancelAllProtectedJobs(reason)
+            workMainJob.cancel(reason)
         }
     }
 
     fun getStartedJobsMap() = this.startedJobs
 
-    fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive }
+    fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive || it.key.anyProtectJobsRunning() }
 
-    fun getInactiveJobs() = this.getStartedJobsMap().filter { !it.value.isActive }
+    fun getInactiveJobs() = this.getStartedJobsMap().filter { !it.value.isActive && !it.key.anyProtectJobsRunning() }
 
     fun initialize(expectedJobs: Int) {
         this.startedJobs.clear()

@@ -21,10 +21,6 @@ data class WorkResult(
             return WorkResult(WorkState.STOPPED, output, stoppedReason = reason)
         }
 
-        fun stepCompleted(output: WorkData = WorkData.build()): WorkResult {
-            return WorkResult(WorkState.STEP_COMPLETED, output)
-        }
-
         fun completed(output: WorkData = WorkData.build()): WorkResult {
             return WorkResult(WorkState.COMPLETED, output)
         }

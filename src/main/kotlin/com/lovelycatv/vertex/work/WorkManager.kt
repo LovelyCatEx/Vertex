@@ -19,7 +19,7 @@ class WorkManager {
     fun getWorkById(workId: String): AbstractWork? {
         for ((_, workScope) in workScopes) {
             for ((workInstance, _) in workScope.getStartedJobsMap()) {
-                if (workInstance.workId == workId) {
+                if (workInstance.workName == workId) {
                     return workInstance
                 }
             }
@@ -74,6 +74,8 @@ class WorkManager {
                             work.startWork()
                         }
                         result.await()
+                        // Wait until protected jobs stopped
+                        work.waitForProtectedJobs()
                     }
                 } else {
                     if (block.parallelInBound) {
@@ -86,6 +88,10 @@ class WorkManager {
                         }
 
                         deferred.awaitAll()
+                        // Wait until protected jobs stopped
+                        block.works.forEach {
+                            it.waitForProtectedJobs()
+                        }
                     } else {
                         // Parallel
                         block.works.forEachIndexed { index, work ->
@@ -99,5 +105,17 @@ class WorkManager {
             }
         }
         return scope to workCoroutineScope
+    }
+
+    suspend fun stopWorkChain(workChain: WorkChainCoroutineScope, works: WorkCoroutineScope, reason: String = "") {
+        workChain.cancel(reason)
+        works.stopCurrentWorks(reason)
+        println("WorkChain was stopped for reason: $reason")
+    }
+
+    fun forceStopWorkChain(workChain: WorkChainCoroutineScope, works: WorkCoroutineScope, reason: String = "") {
+        workChain.cancel(reason)
+        works.forceStopCurrentWorks(reason)
+        println("WorkChain was force stopped for reason: $reason")
     }
 }

@@ -11,6 +11,5 @@ enum class WorkState {
     STOPPED,
     FAILED,
     ERROR,
-    STEP_COMPLETED,
     COMPLETED
 }
