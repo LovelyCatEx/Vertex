@@ -79,6 +79,18 @@ abstract class AbstractWork(
         }
     }
 
+    suspend fun stopWork(job: Job, reason: String) {
+        this.waitForProtectedJobs()
+        job.cancel(reason)
+        this.postWorkResult(WorkResult.stopped(reason))
+    }
+
+    fun forceStopWork(job: Job, reason: String) {
+        this.cancelAllProtectedJobs(reason)
+        job.cancel(reason)
+        this.postWorkResult(WorkResult.stopped(reason))
+    }
+
     private fun postWorkStarted(output: WorkData = WorkData.build()) {
         postWorkResult(WorkResult.running(output))
     }

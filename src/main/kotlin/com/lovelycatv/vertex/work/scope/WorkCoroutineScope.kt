@@ -58,17 +58,13 @@ class WorkCoroutineScope(
 
     suspend fun stopCurrentWorks(reason: String = "") {
         getActiveJobs().forEach { (work, workMainJob) ->
-            while (work.anyProtectJobsRunning()) {
-                delay(100)
-            }
-            workMainJob.cancel(reason)
+            work.stopWork(workMainJob, reason)
         }
     }
 
     fun forceStopCurrentWorks(reason: String = "") {
         getActiveJobs().forEach { (work, workMainJob) ->
-            work.cancelAllProtectedJobs(reason)
-            workMainJob.cancel(reason)
+            work.forceStopWork(workMainJob, reason)
         }
     }
 
