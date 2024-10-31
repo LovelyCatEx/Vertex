@@ -2,6 +2,7 @@ import com.lovelycatv.vertex.work.WorkChain
 import com.lovelycatv.vertex.work.WorkData
 import com.lovelycatv.vertex.work.WorkManager
 import com.lovelycatv.vertex.work.WorkResult
+import com.lovelycatv.vertex.work.base.AbstractStateWork
 import com.lovelycatv.vertex.work.base.AbstractWork
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -38,7 +39,7 @@ class WorkManagerTest {
         }
     }
 
-    class SimpleWork(workName: String) : AbstractWork(workName) {
+    class SimpleWork(workName: String) : AbstractStateWork(workName) {
         override suspend fun doWork(inputData: WorkData): WorkResult {
             delay((500L..2000L).random())
             println(workName)
@@ -46,7 +47,7 @@ class WorkManagerTest {
         }
     }
 
-    class ProtectedWork(workName: String) : AbstractWork(workName) {
+    class ProtectedWork(workName: String) : AbstractStateWork(workName) {
         override suspend fun doWork(inputData: WorkData): WorkResult {
             runInProtected {
                 for (i in (0..5)) {

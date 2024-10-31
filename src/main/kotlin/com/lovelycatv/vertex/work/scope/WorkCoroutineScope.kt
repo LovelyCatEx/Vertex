@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.work.scope
 import com.lovelycatv.vertex.extension.runCoroutine
 import com.lovelycatv.vertex.extension.runCoroutineAsync
 import com.lovelycatv.vertex.work.WorkExceptionHandler
+import com.lovelycatv.vertex.work.base.AbstractStateWork
 import com.lovelycatv.vertex.work.base.AbstractWork
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeAwaitTimeoutException
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeNotInitializedException
@@ -16,7 +17,7 @@ class WorkCoroutineScope(
 ) : CoroutineScope {
     private val job = Job()
 
-    private val startedJobs = mutableMapOf<AbstractWork, Job>()
+    private val startedJobs = mutableMapOf<AbstractStateWork, Job>()
 
     override val coroutineContext: CoroutineContext
         get() = context + job
@@ -29,7 +30,7 @@ class WorkCoroutineScope(
         }
     }
 
-    fun launchTask(identifier: AbstractWork, context: CoroutineContext = EmptyCoroutineContext, task: suspend () -> Unit): Job {
+    fun launchTask(identifier: AbstractStateWork, context: CoroutineContext = EmptyCoroutineContext, task: suspend () -> Unit): Job {
         this.checkAvailability()
         val newJob = runCoroutine(this, context) {
             try {
@@ -42,7 +43,7 @@ class WorkCoroutineScope(
         return newJob
     }
 
-    fun <R> launchTaskAsync(identifier: AbstractWork, context: CoroutineContext = EmptyCoroutineContext, task: suspend () -> R): Deferred<R?> {
+    fun <R> launchTaskAsync(identifier: AbstractStateWork, context: CoroutineContext = EmptyCoroutineContext, task: suspend () -> R): Deferred<R?> {
         this.checkAvailability()
         val newJob = runCoroutineAsync(this, context) {
             try {

@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.work
 
+import com.lovelycatv.vertex.work.base.AbstractStateWork
 import com.lovelycatv.vertex.work.base.AbstractWork
 
 /**
@@ -11,7 +12,7 @@ class WorkChain(val blocks: List<Block>) {
     fun getTotalWorks(): Int = blocks.flatMap { it.works }.size
 
     data class Block(
-        val works: List<AbstractWork>,
+        val works: List<AbstractStateWork>,
         val isParallel: Boolean,
         val parallelInBound: Boolean
     )
@@ -19,17 +20,17 @@ class WorkChain(val blocks: List<Block>) {
     class Builder {
         private val blocks = mutableListOf<Block>()
 
-        fun sequence(vararg works: AbstractWork): Builder {
+        fun sequence(vararg works: AbstractStateWork): Builder {
             blocks.add(Block(works.toList(), isParallel = false, parallelInBound = true))
             return this
         }
 
-        fun parallel(vararg works: AbstractWork): Builder {
+        fun parallel(vararg works: AbstractStateWork): Builder {
             blocks.add(Block(works.toList(), isParallel = true, parallelInBound = false))
             return this
         }
 
-        fun parallelInBound(vararg works: AbstractWork): Builder {
+        fun parallelInBound(vararg works: AbstractStateWork): Builder {
             blocks.add(Block(works.toList(), isParallel = true, parallelInBound = true))
             return this
         }

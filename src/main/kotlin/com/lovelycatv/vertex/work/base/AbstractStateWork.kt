@@ -1,0 +1,59 @@
+package com.lovelycatv.vertex.work.base
+
+import com.lovelycatv.vertex.work.WorkData
+import com.lovelycatv.vertex.work.WorkResult
+import com.lovelycatv.vertex.work.WorkState
+import com.lovelycatv.vertex.work.exception.WorkNotCompletedException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+
+/**
+ * @author lovelycat
+ * @since 2024-10-31 15:59
+ * @version 1.0
+ */
+abstract class AbstractStateWork(
+    workName: String,
+    inputData: WorkData = WorkData.build()
+) : AbstractProtectedWork(workName, inputData) {
+    private var workResult = MutableStateFlow(WorkResult(WorkState.INITIALIZED))
+
+    fun getCurrentWorkResultFlow() = this.workResult
+
+    fun getCurrentWorkResult() = this.workResult.value
+
+    override suspend fun startWork(): WorkResult {
+        val currentState = this.getCurrentWorkResult().state
+        if (currentState != WorkState.RUNNING) {
+            return try {
+                postWorkResult(WorkResult(WorkState.RUNNING))
+                val result = doWork(inputData)
+                postWorkResult(result)
+                result
+            } catch (e: Exception) {
+                postWorkResult(WorkResult.error(e))
+                getCurrentWorkResult()
+            }
+        } else {
+            throw WorkNotCompletedException(this)
+        }
+    }
+
+    override suspend fun stopWork(job: Job, reason: String) {
+        super.stopWork(job, reason)
+        this.postWorkResult(WorkResult.stopped(reason))
+    }
+
+    override fun forceStopWork(job: Job, reason: String) {
+        super.forceStopWork(job, reason)
+        this.postWorkResult(WorkResult.stopped(reason))
+    }
+
+    private fun postWorkResult(workResult: WorkResult) {
+        this.workResult.value = workResult
+    }
+
+    protected fun postWorkProgress(outputData: WorkData) {
+        this.postWorkResult(WorkResult.running(outputData))
+    }
+}
