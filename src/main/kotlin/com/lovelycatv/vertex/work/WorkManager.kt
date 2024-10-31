@@ -93,13 +93,23 @@ class WorkManager {
                 interceptor?.beforeBlockStarted(blockCount, block)
                 if (!block.isParallel) {
                     // In sequence
-                    for ((workCount, work) in block.works.withIndex()) {
-                        interceptor?.beforeWorkStarted(blockCount, block, workCount, work.getWorker())
+                    for (work in block.works) {
+                        interceptor?.beforeWorkStarted(blockCount, block, work)
                         val finalResult = runWorkWithRetry(workCoroutineScope, work)
                         if (!finalResult.isCompletedOrStopped()) {
                             if (work.getFailureStrategy() == WorkFailureStrategy.INTERRUPT_BLOCK) {
+                                interceptor?.onBlockInterrupted(
+                                    blockIndex = blockCount,
+                                    block = block,
+                                    producer = work
+                                )
                                 break
                             } else if (work.getFailureStrategy() == WorkFailureStrategy.INTERRUPT_CHAIN) {
+                                interceptor?.onChainInterrupted(
+                                    blockIndex = blockCount,
+                                    block = block,
+                                    producer = work
+                                )
                                 return@launch
                             }
                         }
@@ -111,8 +121,8 @@ class WorkManager {
 
                     if (block.parallelInBound) {
                         // Parallel in bound
-                        val deferred = block.works.mapIndexed { index, work ->
-                            interceptor?.beforeWorkStarted(blockCount, block, index, work.getWorker())
+                        val deferred = block.works.map { work ->
+                            interceptor?.beforeWorkStarted(blockCount, block, work)
                             workCoroutineScope.launchTaskAsync(work)
                         }
 
@@ -128,14 +138,24 @@ class WorkManager {
                         // Check again and determine whether to do next
                         val finalFailedStrategies = fxHasFailedWorks(failedWorks.awaitAll()).map { block.works[it] }.map { it.getFailureStrategy() }
                         if (finalFailedStrategies.contains(WorkFailureStrategy.INTERRUPT_CHAIN)) {
+                            interceptor?.onChainInterrupted(
+                                blockIndex = blockCount,
+                                block = block,
+                                producer = block.works[finalFailedStrategies.indexOf(WorkFailureStrategy.INTERRUPT_CHAIN)]
+                            )
                             return@launch
-                        } else if (finalFailedStrategies.contains(WorkFailureStrategy.IGNORE)) {
+                        } else if (finalFailedStrategies.contains(WorkFailureStrategy.INTERRUPT_BLOCK)) {
+                            interceptor?.onBlockInterrupted(
+                                blockIndex = blockCount,
+                                block = block,
+                                producer = block.works[finalFailedStrategies.indexOf(WorkFailureStrategy.INTERRUPT_BLOCK)]
+                            )
                             break
                         }
                     } else {
                         // Parallel
-                        block.works.forEachIndexed { index, work ->
-                            interceptor?.beforeWorkStarted(blockCount, block, index, work.getWorker())
+                        block.works.forEach { work ->
+                            interceptor?.beforeWorkStarted(blockCount, block, work)
                             workCoroutineScope.launchTask(work)
                         }
                     }

@@ -5,7 +5,10 @@ import com.lovelycatv.vertex.work.WorkResult
 import com.lovelycatv.vertex.work.base.AbstractStateWork
 import com.lovelycatv.vertex.work.base.AbstractWork
 import com.lovelycatv.vertex.work.base.AbstractWorker
+import com.lovelycatv.vertex.work.base.WrappedWorker
 import com.lovelycatv.vertex.work.extension.WorkerBuilder
+import com.lovelycatv.vertex.work.interceptor.AbstractWorkChainInterceptor
+import com.lovelycatv.vertex.work.interceptor.DefaultWorkChainInterceptor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -20,9 +23,9 @@ class WorkManagerTest {
         runBlocking {
             val workManager = WorkManager()
 
-            val work1 = WorkerBuilder<SimpleWork>().workName("work1").retry(3) { 2000 }.interruptChainWhenFailure().build()
-            val work2 = WorkerBuilder<SimpleWork>().workName("work2").retry(3) { 2000 }.interruptBlockWhenFailure().build()
-            val work3 = WorkerBuilder<SimpleWork>().workName("work3").retry(3) { 2000 }.interruptBlockWhenFailure().build()
+            val work1 = WorkerBuilder<SimpleWork>().workName("work1").retry(3) { 1000 }.interruptBlockWhenFailure().build()
+            val work2 = WorkerBuilder<SimpleWork>().workName("work2").retry(3) { 800 }.interruptBlockWhenFailure().build()
+            val work3 = WorkerBuilder<SimpleWork>().workName("work3").retry(3) { 600 }.interruptBlockWhenFailure().build()
 
             val workA = WorkerBuilder<ProtectedWork>().workName("workA").retry(3) { 200 }.interruptChainWhenFailure().build()
             val workB = WorkerBuilder<ProtectedWork>().workName("workB").build()
@@ -36,9 +39,19 @@ class WorkManagerTest {
                 .sequence(workC, workD)
                 .build()
 
-            val (chain, works) = workManager.runWorkChain(chainA)
-            delay(2500)
+            val (chain, works) = workManager.runWorkChain(chainA, interceptor = object : DefaultWorkChainInterceptor() {
+                override fun beforeBlockStarted(blockIndex: Int, block: WorkChain.Block) {
+                    println(">>> $blockIndex started")
+                }
 
+                override fun onBlockInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker) {
+                    println("${producer.getWorkerId()} produced the block interrupted")
+                }
+
+                override fun onChainInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker) {
+                    println("${producer.getWorkerId()} produced the chain interrupted")
+                }
+            })
 
             delay(20000)
         }

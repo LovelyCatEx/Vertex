@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.work.interceptor
 
 import com.lovelycatv.vertex.work.WorkChain
 import com.lovelycatv.vertex.work.base.AbstractWork
+import com.lovelycatv.vertex.work.base.WrappedWorker
 
 /**
  * @author lovelycat
@@ -11,5 +12,9 @@ import com.lovelycatv.vertex.work.base.AbstractWork
 abstract class AbstractWorkChainInterceptor {
     abstract fun beforeBlockStarted(blockIndex: Int, block: WorkChain.Block)
 
-    abstract fun beforeWorkStarted(blockIndex: Int, block: WorkChain.Block, workIndex: Int, work: AbstractWork)
+    abstract fun beforeWorkStarted(blockIndex: Int, block: WorkChain.Block, work: WrappedWorker)
+
+    abstract fun onBlockInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker)
+
+    abstract fun onChainInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker)
 }
