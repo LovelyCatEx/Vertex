@@ -2,14 +2,16 @@ package com.lovelycatv.vertex.work.scope
 
 import com.lovelycatv.vertex.extension.runCoroutine
 import com.lovelycatv.vertex.extension.runCoroutineAsync
-import com.lovelycatv.vertex.work.WorkExceptionHandler
-import com.lovelycatv.vertex.work.base.AbstractStateWork
-import com.lovelycatv.vertex.work.base.AbstractWork
+import com.lovelycatv.vertex.work.WorkResult
+import com.lovelycatv.vertex.work.base.WrappedWorker
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeAwaitTimeoutException
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeNotInitializedException
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+
+typealias WorkExceptionHandler = (worker: WrappedWorker, e: Exception) -> Unit
+
 
 class WorkCoroutineScope(
     private val context: CoroutineContext = Dispatchers.IO,
@@ -17,7 +19,7 @@ class WorkCoroutineScope(
 ) : CoroutineScope {
     private val job = Job()
 
-    private val startedJobs = mutableMapOf<AbstractStateWork, Job>()
+    private val startedJobs = mutableMapOf<WrappedWorker, Job>()
 
     override val coroutineContext: CoroutineContext
         get() = context + job
@@ -30,50 +32,53 @@ class WorkCoroutineScope(
         }
     }
 
-    fun launchTask(identifier: AbstractStateWork, context: CoroutineContext = EmptyCoroutineContext, task: suspend () -> Unit): Job {
+    fun launchTask(identifier: WrappedWorker, context: CoroutineContext = EmptyCoroutineContext): Job {
         this.checkAvailability()
         val newJob = runCoroutine(this, context) {
             try {
-                task()
+                identifier.getWorker().startWork()
             } catch (e: Exception) {
-                this.exceptionHandler?.invoke(e)
+                e.printStackTrace()
+                this.exceptionHandler?.invoke(identifier, e)
             }
         }
         startedJobs[identifier] = newJob
+        println("Worker [${identifier.getWorker().workName}::${identifier.getWorkerId()}] started")
         return newJob
     }
 
-    fun <R> launchTaskAsync(identifier: AbstractStateWork, context: CoroutineContext = EmptyCoroutineContext, task: suspend () -> R): Deferred<R?> {
+    fun launchTaskAsync(identifier: WrappedWorker, context: CoroutineContext = EmptyCoroutineContext): Deferred<WorkResult> {
         this.checkAvailability()
         val newJob = runCoroutineAsync(this, context) {
             try {
-                task()
+                identifier.getWorker().startWork()
             } catch (e: Exception) {
-                this.exceptionHandler?.invoke(e)
-                null
+                this.exceptionHandler?.invoke(identifier, e)
+                identifier.getWorker().getCurrentWorkResult()
             }
         }
         startedJobs[identifier] = newJob
+        println("Worker [${identifier.getWorker().workName}::${identifier.getWorkerId()}] started")
         return newJob
     }
 
     suspend fun stopCurrentWorks(reason: String = "") {
         getActiveJobs().forEach { (work, workMainJob) ->
-            work.stopWork(workMainJob, reason)
+            work.getWorker().stopWork(workMainJob, reason)
         }
     }
 
     fun forceStopCurrentWorks(reason: String = "") {
         getActiveJobs().forEach { (work, workMainJob) ->
-            work.forceStopWork(workMainJob, reason)
+            work.getWorker().forceStopWork(workMainJob, reason)
         }
     }
 
     fun getStartedJobsMap() = this.startedJobs
 
-    fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive || it.key.anyProtectJobsRunning() }
+    fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive || it.key.getWorker().anyProtectJobsRunning() }
 
-    fun getInactiveJobs() = this.getStartedJobsMap().filter { !it.value.isActive && !it.key.anyProtectJobsRunning() }
+    fun getInactiveJobs() = this.getStartedJobsMap().filter { !it.value.isActive && !it.key.getWorker().anyProtectJobsRunning() }
 
     fun initialize(expectedJobs: Int) {
         this.startedJobs.clear()

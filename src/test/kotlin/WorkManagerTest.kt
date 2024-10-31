@@ -4,6 +4,8 @@ import com.lovelycatv.vertex.work.WorkManager
 import com.lovelycatv.vertex.work.WorkResult
 import com.lovelycatv.vertex.work.base.AbstractStateWork
 import com.lovelycatv.vertex.work.base.AbstractWork
+import com.lovelycatv.vertex.work.base.AbstractWorker
+import com.lovelycatv.vertex.work.extension.WorkerBuilder
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -18,42 +20,56 @@ class WorkManagerTest {
         runBlocking {
             val workManager = WorkManager()
 
-            val work1 = SimpleWork("work1")
-            val work2 = SimpleWork("work2")
-            val work3 = SimpleWork("work3")
+            val work1 = WorkerBuilder<SimpleWork>().workName("work1").retry(3) { 2000 }.interruptChainWhenFailure().build()
+            val work2 = WorkerBuilder<SimpleWork>().workName("work2").retry(3) { 2000 }.interruptBlockWhenFailure().build()
+            val work3 = WorkerBuilder<SimpleWork>().workName("work3").retry(3) { 2000 }.interruptBlockWhenFailure().build()
 
-            val workA = ProtectedWork("workA")
-            val workB = ProtectedWork("workB")
+            val workA = WorkerBuilder<ProtectedWork>().workName("workA").retry(3) { 200 }.interruptChainWhenFailure().build()
+            val workB = WorkerBuilder<ProtectedWork>().workName("workB").build()
+
+            val workC = WorkerBuilder<ProtectedWork>().workName("workC").build()
+            val workD = WorkerBuilder<ProtectedWork>().workName("workD").build()
 
             val chainA = WorkChain.Builder()
-                .parallel(work1, work2, work3)
+                .parallelInBound(work1, work2, work3)
                 .sequence(workA, workB)
+                .sequence(workC, workD)
                 .build()
 
             val (chain, works) = workManager.runWorkChain(chainA)
             delay(2500)
 
-            workManager.stopWorkChain(chain, works, "REASON")
 
             delay(20000)
         }
     }
 
-    class SimpleWork(workName: String) : AbstractStateWork(workName) {
+    class SimpleWork(workName: String, inputData: WorkData) : AbstractWorker(workName, inputData) {
         override suspend fun doWork(inputData: WorkData): WorkResult {
-            delay((500L..2000L).random())
             println(workName)
+            throw RuntimeException("123456")
             return WorkResult.completed()
         }
     }
 
-    class ProtectedWork(workName: String) : AbstractStateWork(workName) {
+    class ProtectedWork(workName: String, inputData: WorkData) : AbstractWorker(workName, inputData) {
         override suspend fun doWork(inputData: WorkData): WorkResult {
-            runInProtected {
-                for (i in (0..5)) {
-                    delay(1000)
-                    println("$workName: $i")
+            for (i in (0..5)) {
+                delay(1000)
+                println("$workName: $i")
+                if ((0..10).random() >= 4) {
+                    throw RuntimeException("123456")
                 }
+            }
+            return WorkResult.completed()
+        }
+    }
+
+    class ProtectedWork2(workName: String, inputData: WorkData) : AbstractWorker(workName, inputData) {
+        override suspend fun doWork(inputData: WorkData): WorkResult {
+            for (i in (0..5)) {
+                delay(1000)
+                println("$workName: $i")
             }
             return WorkResult.completed()
         }

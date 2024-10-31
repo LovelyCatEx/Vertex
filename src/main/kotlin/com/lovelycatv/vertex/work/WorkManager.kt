@@ -1,9 +1,12 @@
 package com.lovelycatv.vertex.work
 
-import com.lovelycatv.vertex.work.base.AbstractWork
-import com.lovelycatv.vertex.work.base.AbstractWorkChainInterceptor
+import com.lovelycatv.vertex.extension.runCoroutineAsync
+import com.lovelycatv.vertex.work.interceptor.AbstractWorkChainInterceptor
+import com.lovelycatv.vertex.work.base.WrappedWorker
+import com.lovelycatv.vertex.work.exception.DuplicateWorkerIdException
 import com.lovelycatv.vertex.work.scope.WorkChainCoroutineScope
 import com.lovelycatv.vertex.work.scope.WorkCoroutineScope
+import com.lovelycatv.vertex.work.scope.WorkExceptionHandler
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
@@ -16,15 +19,28 @@ import kotlin.coroutines.CoroutineContext
 class WorkManager {
     private val workScopes = mutableMapOf<String, WorkCoroutineScope>()
 
-    fun getWorkById(workId: String): AbstractWork? {
-        for ((_, workScope) in workScopes) {
-            for ((workInstance, _) in workScope.getStartedJobsMap()) {
-                if (workInstance.workName == workId) {
-                    return workInstance
+    private fun getWorkersBy(condition: (WrappedWorker) -> Boolean): List<WrappedWorker> {
+        val result = mutableListOf<WrappedWorker>()
+        for ((_, scope) in workScopes) {
+            scope.getStartedJobsMap().forEach { (worker, _) ->
+                if (condition(worker)) {
+                    result.add(worker)
                 }
             }
         }
-        return null
+        return result
+    }
+
+    private fun getWorkerById(workerId: String): WrappedWorker? {
+        return getWorkersBy {
+            it.getWorkerId() == workerId
+        }.run { if (this.isEmpty()) null else this[0] }
+    }
+
+    private fun getWorkersByName(workerName: String): List<WrappedWorker> {
+        return getWorkersBy {
+            it.getWorker().workName == workerName
+        }
     }
 
     private fun requireEmptyWorkCoroutineScope(
@@ -56,6 +72,15 @@ class WorkManager {
         exceptionHandler: WorkExceptionHandler? = null,
         interceptor: AbstractWorkChainInterceptor? = null
     ): Pair<WorkChainCoroutineScope, WorkCoroutineScope> {
+        // Validate workerId
+        val existingWorkers = workChain.blocks.flatMap { it.works }.mapNotNull {
+            this.getWorkerById(it.getWorkerId())
+        }
+
+        if (existingWorkers.isNotEmpty()) {
+            throw DuplicateWorkerIdException(existingWorkers[0].getWorkerId())
+        }
+
         // Find a empty WorkCoroutineScope
         val (_, workCoroutineScope) = requireEmptyWorkCoroutineScope(coroutineContext, exceptionHandler)
 
@@ -69,42 +94,72 @@ class WorkManager {
                 if (!block.isParallel) {
                     // In sequence
                     for ((workCount, work) in block.works.withIndex()) {
-                        interceptor?.beforeWorkStarted(blockCount, block, workCount, work)
-                        val result = workCoroutineScope.launchTaskAsync(work) {
-                            work.startWork()
+                        interceptor?.beforeWorkStarted(blockCount, block, workCount, work.getWorker())
+                        val finalResult = runWorkWithRetry(workCoroutineScope, work)
+                        if (!finalResult.isCompletedOrStopped()) {
+                            if (work.getFailureStrategy() == WorkFailureStrategy.INTERRUPT_BLOCK) {
+                                break
+                            } else if (work.getFailureStrategy() == WorkFailureStrategy.INTERRUPT_CHAIN) {
+                                return@launch
+                            }
                         }
-                        result.await()
-                        // Wait until protected jobs stopped
-                        work.waitForProtectedJobs()
                     }
                 } else {
+                    val fxHasFailedWorks = fun (results: List<WorkResult>): List<Int> {
+                        return results.mapIndexedNotNull { index, it -> if (!it.isCompletedOrStopped()) index else null }
+                    }
+
                     if (block.parallelInBound) {
                         // Parallel in bound
                         val deferred = block.works.mapIndexed { index, work ->
-                            interceptor?.beforeWorkStarted(blockCount, block, index, work)
-                            workCoroutineScope.launchTaskAsync(work) {
-                                work.startWork()
-                            }
+                            interceptor?.beforeWorkStarted(blockCount, block, index, work.getWorker())
+                            workCoroutineScope.launchTaskAsync(work)
                         }
 
-                        deferred.awaitAll()
-                        // Wait until protected jobs stopped
-                        block.works.forEach {
-                            it.waitForProtectedJobs()
+                        val results = deferred.awaitAll()
+                        // Check and retry failure works
+                        val failedWorks = fxHasFailedWorks(results)
+                            .map { block.works[it] }
+                            .map {
+                                runCoroutineAsync {
+                                    runWorkWithRetry(workCoroutineScope, it)
+                                }
+                            }
+                        // Check again and determine whether to do next
+                        val finalFailedStrategies = fxHasFailedWorks(failedWorks.awaitAll()).map { block.works[it] }.map { it.getFailureStrategy() }
+                        if (finalFailedStrategies.contains(WorkFailureStrategy.INTERRUPT_CHAIN)) {
+                            return@launch
+                        } else if (finalFailedStrategies.contains(WorkFailureStrategy.IGNORE)) {
+                            break
                         }
                     } else {
                         // Parallel
                         block.works.forEachIndexed { index, work ->
-                            interceptor?.beforeWorkStarted(blockCount, block, index, work)
-                            workCoroutineScope.launchTask(work) {
-                                work.startWork()
-                            }
+                            interceptor?.beforeWorkStarted(blockCount, block, index, work.getWorker())
+                            workCoroutineScope.launchTask(work)
                         }
                     }
                 }
             }
         }
+
         return scope to workCoroutineScope
+    }
+
+    private suspend fun runWorkWithRetry(workScope: WorkCoroutineScope, work: WrappedWorker): WorkResult {
+        var result: WorkResult? = null
+        var retriedCount = 1
+        val maxRetryTimes = work.getRetryStrategy().maxRetryTimes
+        if (work.getRetryStrategy().type == WorkRetryStrategy.Type.RETRY) {
+            while (result == null || (!result.isCompletedOrStopped() && retriedCount <= maxRetryTimes)) {
+                delay(work.getRetryStrategy().retryInterval.invoke(retriedCount))
+                result = workScope.launchTaskAsync(work).await()
+                retriedCount++
+            }
+        } else {
+            result = workScope.launchTaskAsync(work).await()
+        }
+        return result
     }
 
     suspend fun stopWorkChain(workChain: WorkChainCoroutineScope, works: WorkCoroutineScope, reason: String = "") {

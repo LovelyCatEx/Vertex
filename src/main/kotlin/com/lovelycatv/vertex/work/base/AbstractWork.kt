@@ -10,9 +10,9 @@ import kotlinx.coroutines.cancel
  * @since 2024-10-27 20:09
  * @version 1.0
  */
-abstract class AbstractWork(
+sealed class AbstractWork(
     val workName: String,
-    val inputData: WorkData = WorkData.build()
+    val inputData: WorkData
 ) {
     private var lastStartedTimestamp = 0L
 

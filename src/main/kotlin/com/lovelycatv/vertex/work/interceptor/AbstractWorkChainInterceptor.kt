@@ -1,6 +1,7 @@
-package com.lovelycatv.vertex.work.base
+package com.lovelycatv.vertex.work.interceptor
 
 import com.lovelycatv.vertex.work.WorkChain
+import com.lovelycatv.vertex.work.base.AbstractWork
 
 /**
  * @author lovelycat

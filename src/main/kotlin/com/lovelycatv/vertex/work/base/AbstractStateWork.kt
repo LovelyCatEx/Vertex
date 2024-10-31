@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * @since 2024-10-31 15:59
  * @version 1.0
  */
-abstract class AbstractStateWork(
+sealed class AbstractStateWork(
     workName: String,
-    inputData: WorkData = WorkData.build()
+    inputData: WorkData
 ) : AbstractProtectedWork(workName, inputData) {
     private var workResult = MutableStateFlow(WorkResult(WorkState.INITIALIZED))
 
@@ -33,6 +33,8 @@ abstract class AbstractStateWork(
             } catch (e: Exception) {
                 postWorkResult(WorkResult.error(e))
                 getCurrentWorkResult()
+                // Throw the exception to WorkCoroutineScope
+                throw e
             }
         } else {
             throw WorkNotCompletedException(this)

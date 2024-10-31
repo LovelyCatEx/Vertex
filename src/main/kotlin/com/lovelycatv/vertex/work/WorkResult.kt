@@ -12,6 +12,8 @@ data class WorkResult(
     val stoppedReason: String? = null,
     val exception: Exception? = null
 ) {
+    fun isCompletedOrStopped() = this.state == WorkState.COMPLETED || this.state == WorkState.STOPPED
+
     companion object {
         fun running(output: WorkData = WorkData.build()): WorkResult {
             return WorkResult(WorkState.RUNNING, output)
