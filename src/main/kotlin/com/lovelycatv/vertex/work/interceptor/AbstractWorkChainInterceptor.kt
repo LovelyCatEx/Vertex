@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.work.interceptor
 
-import com.lovelycatv.vertex.work.WorkChain
+import com.lovelycatv.vertex.work.worker.WorkChain
 import com.lovelycatv.vertex.work.worker.WrappedWorker
 
 /**

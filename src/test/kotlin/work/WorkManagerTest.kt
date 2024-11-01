@@ -1,6 +1,6 @@
 package work
 
-import com.lovelycatv.vertex.work.WorkChain
+import com.lovelycatv.vertex.work.worker.WorkChain
 import com.lovelycatv.vertex.work.WorkManager
 import com.lovelycatv.vertex.work.data.KeyValueMergedInputDataMerger
 import com.lovelycatv.vertex.work.extension.WorkerBuilder

@@ -1,8 +1,7 @@
-package com.lovelycatv.vertex.work
+package com.lovelycatv.vertex.work.worker
 
 import com.lovelycatv.vertex.work.data.InputWorkDataMerger
 import com.lovelycatv.vertex.work.data.OverridingInputDataMerger
-import com.lovelycatv.vertex.work.worker.WrappedWorker
 
 /**
  * @author lovelycat
