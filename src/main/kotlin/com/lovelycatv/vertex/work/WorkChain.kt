@@ -1,6 +1,8 @@
 package com.lovelycatv.vertex.work
 
-import com.lovelycatv.vertex.work.base.WrappedWorker
+import com.lovelycatv.vertex.work.data.InputWorkDataMerger
+import com.lovelycatv.vertex.work.data.OverridingInputDataMerger
+import com.lovelycatv.vertex.work.worker.WrappedWorker
 
 /**
  * @author lovelycat
@@ -13,7 +15,8 @@ class WorkChain(val blocks: List<Block>) {
     data class Block(
         val works: List<WrappedWorker>,
         val isParallel: Boolean,
-        val parallelInBound: Boolean
+        val parallelInBound: Boolean,
+        val inputWorkDataMerger: InputWorkDataMerger = OverridingInputDataMerger()
     )
 
     class Builder {
@@ -31,6 +34,21 @@ class WorkChain(val blocks: List<Block>) {
 
         fun parallelInBound(vararg works: WrappedWorker): Builder {
             blocks.add(Block(works.toList(), isParallel = true, parallelInBound = true))
+            return this
+        }
+
+        fun transmit(inputWorkDataMerger: InputWorkDataMerger): Builder {
+            val lastBlock = blocks[blocks.lastIndex]
+
+            // Parallel Block is not supported
+            if (lastBlock.isParallel && !lastBlock.parallelInBound) {
+                throw IllegalStateException("Parallel Block does not support transmitting data to next Block")
+            }
+
+            blocks[blocks.lastIndex] = lastBlock.copy(
+                inputWorkDataMerger = inputWorkDataMerger
+            )
+
             return this
         }
 

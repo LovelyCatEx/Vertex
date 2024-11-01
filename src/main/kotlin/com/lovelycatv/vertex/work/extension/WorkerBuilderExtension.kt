@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.work.extension
 
 import com.lovelycatv.vertex.work.base.AbstractWorker
-import com.lovelycatv.vertex.work.base.WrappedWorker
+import com.lovelycatv.vertex.work.worker.WrappedWorker
 import java.util.UUID
 
 /**

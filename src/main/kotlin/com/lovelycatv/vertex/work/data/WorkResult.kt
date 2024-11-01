@@ -1,6 +1,6 @@
-package com.lovelycatv.vertex.work
+package com.lovelycatv.vertex.work.data
 
-import com.lovelycatv.vertex.work.data.WorkData
+import com.lovelycatv.vertex.work.WorkState
 
 /**
  * @author lovelycat

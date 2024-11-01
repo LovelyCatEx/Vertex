@@ -3,8 +3,8 @@ package com.lovelycatv.vertex.work.scope
 import com.lovelycatv.vertex.extension.runCoroutine
 import com.lovelycatv.vertex.extension.runCoroutineAsync
 import com.lovelycatv.vertex.work.data.WorkData
-import com.lovelycatv.vertex.work.WorkResult
-import com.lovelycatv.vertex.work.base.WrappedWorker
+import com.lovelycatv.vertex.work.data.WorkResult
+import com.lovelycatv.vertex.work.worker.WrappedWorker
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeAwaitTimeoutException
 import com.lovelycatv.vertex.work.exception.WorkCoroutineScopeNotInitializedException
 import kotlinx.coroutines.*
@@ -33,33 +33,33 @@ class WorkCoroutineScope(
         }
     }
 
-    fun launchTask(identifier: WrappedWorker, context: CoroutineContext = EmptyCoroutineContext): Job {
+    fun launchTask(wrappedWorker: WrappedWorker, inputData: WorkData, context: CoroutineContext = EmptyCoroutineContext): Job {
         this.checkAvailability()
         val newJob = runCoroutine(this, context) {
             try {
-                identifier.getWorker().startWork(WorkData.build())
+                wrappedWorker.getWorker().startWork(inputData)
             } catch (e: Exception) {
                 e.printStackTrace()
-                this.exceptionHandler?.invoke(identifier, e)
+                this.exceptionHandler?.invoke(wrappedWorker, e)
             }
         }
-        startedJobs[identifier] = newJob
-        println("Worker [${identifier.getWorker().workName}::${identifier.getWorkerId()}] started")
+        startedJobs[wrappedWorker] = newJob
+        println("Worker [${wrappedWorker.getWorker().workName}::${wrappedWorker.getWorkerId()}] started")
         return newJob
     }
 
-    fun launchTaskAsync(identifier: WrappedWorker, context: CoroutineContext = EmptyCoroutineContext): Deferred<WorkResult> {
+    fun launchTaskAsync(wrappedWorker: WrappedWorker, inputData: WorkData, context: CoroutineContext = EmptyCoroutineContext): Deferred<WorkResult> {
         this.checkAvailability()
         val newJob = runCoroutineAsync(this, context) {
             try {
-                identifier.getWorker().startWork(WorkData.build())
+                wrappedWorker.getWorker().startWork(inputData)
             } catch (e: Exception) {
-                this.exceptionHandler?.invoke(identifier, e)
-                identifier.getWorker().getCurrentWorkResult()
+                this.exceptionHandler?.invoke(wrappedWorker, e)
+                wrappedWorker.getWorker().getCurrentWorkResult()
             }
         }
-        startedJobs[identifier] = newJob
-        println("Worker [${identifier.getWorker().workName}::${identifier.getWorkerId()}] started")
+        startedJobs[wrappedWorker] = newJob
+        println("Worker [${wrappedWorker.getWorker().workName}::${wrappedWorker.getWorkerId()}] started")
         return newJob
     }
 

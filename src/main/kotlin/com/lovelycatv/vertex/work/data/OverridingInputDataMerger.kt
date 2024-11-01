@@ -5,7 +5,9 @@ package com.lovelycatv.vertex.work.data
  * @since 2024-10-31 21:41
  * @version 1.0
  */
-class OverridingInputDataMerger(private val determine: (key: String, producerIndex: Int) -> Boolean) : InputWorkDataMerger {
+class OverridingInputDataMerger(
+    private val determine: ((key: String, producerIndex: Int) -> Boolean)? = null
+) : InputWorkDataMerger {
     override fun merge(results: List<WorkData>): WorkData {
         val pairs = results.flatMap { it.toPairList() }
         val keySet = pairs.map { it.first }.toSet()
@@ -25,9 +27,13 @@ class OverridingInputDataMerger(private val determine: (key: String, producerInd
         keySet.forEach { key ->
             val existingIndexes = fxSearchKeyIn(key)
             if (existingIndexes.size > 1) {
-                existingIndexes.forEach { producerIndex ->
-                    if (determine(key, producerIndex)) {
-                        savedPairs.add(key to results[producerIndex][key])
+                if (determine == null) {
+                    savedPairs.add(key to results[existingIndexes.last()][key])
+                } else {
+                    existingIndexes.forEach { producerIndex ->
+                        if (determine.invoke(key, producerIndex)) {
+                            savedPairs.add(key to results[producerIndex][key])
+                        }
                     }
                 }
             } else {

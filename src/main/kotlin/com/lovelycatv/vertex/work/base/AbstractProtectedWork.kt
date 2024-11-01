@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.work.base
 
 import com.lovelycatv.vertex.extension.runCoroutine
 import com.lovelycatv.vertex.work.data.WorkData
-import com.lovelycatv.vertex.work.WorkResult
+import com.lovelycatv.vertex.work.data.WorkResult
 import kotlinx.coroutines.*
 
 /**

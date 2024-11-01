@@ -1,9 +1,10 @@
-package com.lovelycatv.vertex.work.base
+package com.lovelycatv.vertex.work.worker
 
 import com.lovelycatv.vertex.work.RetryIntervalSupplier
 import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.WorkFailureStrategy
 import com.lovelycatv.vertex.work.WorkRetryStrategy
+import com.lovelycatv.vertex.work.base.AbstractWorker
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
