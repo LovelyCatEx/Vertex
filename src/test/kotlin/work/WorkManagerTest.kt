@@ -38,7 +38,7 @@ class WorkManagerTest {
         workManager.runWorkChain(chainA)
 
         runBlocking {
-            delay(20000)
+            delay(10000)
         }
     }
 }

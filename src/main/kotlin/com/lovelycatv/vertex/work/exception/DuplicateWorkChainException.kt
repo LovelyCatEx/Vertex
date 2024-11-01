@@ -5,4 +5,4 @@ package com.lovelycatv.vertex.work.exception
  * @since 2024-10-31 19:40
  * @version 1.0
  */
-class DuplicateWorkerIdException(workerId: String) : RuntimeException("Duplicate worker id: $workerId")
+class DuplicateWorkChainException(workerId: String) : RuntimeException("Duplicate chain id: $workerId")

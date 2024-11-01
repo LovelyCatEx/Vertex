@@ -15,7 +15,7 @@ class SequenceWorker(workName: String, inputData: WorkData) : AbstractWorker(wor
         println("$workName received params: ${inputData.toPairList()}")
         runInProtected {
             for (i in 0..2) {
-                delay(1000)
+                delay(500)
                 println("Sequence Work: $workName -> $i")
             }
         }

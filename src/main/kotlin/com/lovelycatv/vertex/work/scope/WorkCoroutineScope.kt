@@ -75,7 +75,7 @@ class WorkCoroutineScope(
         }
     }
 
-    fun getStartedJobsMap() = this.startedJobs
+    private fun getStartedJobsMap() = this.startedJobs
 
     fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive || it.key.getWorker().anyProtectJobsRunning() }
 
@@ -90,11 +90,13 @@ class WorkCoroutineScope(
         return this.getInactiveJobs().size == this.expectedJobs
     }
 
-    suspend fun await(timeout: Long) {
+    suspend fun await(timeout: Long = 0) {
         val startTime = System.currentTimeMillis()
         while (!this.isAvailable()) {
-            if (System.currentTimeMillis() - startTime >= timeout) {
-                throw WorkCoroutineScopeAwaitTimeoutException(this, timeout)
+            if (timeout > 0) {
+                if (System.currentTimeMillis() - startTime >= timeout) {
+                    throw WorkCoroutineScopeAwaitTimeoutException(this, timeout)
+                }
             }
             delay(100)
         }

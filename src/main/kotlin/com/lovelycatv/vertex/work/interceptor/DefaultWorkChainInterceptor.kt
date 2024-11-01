@@ -16,4 +16,6 @@ open class DefaultWorkChainInterceptor : AbstractWorkChainInterceptor() {
     override fun onBlockInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker) {}
 
     override fun onChainInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker) {}
+
+    override fun onException(producer: WrappedWorker, e: Exception) {}
 }

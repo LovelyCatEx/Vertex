@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.work.worker
 
 import com.lovelycatv.vertex.work.data.InputWorkDataMerger
 import com.lovelycatv.vertex.work.data.OverridingInputDataMerger
+import java.util.UUID
 
 /**
  * @author lovelycat
@@ -9,6 +10,8 @@ import com.lovelycatv.vertex.work.data.OverridingInputDataMerger
  * @version 1.0
  */
 class WorkChain(val blocks: List<Block>) {
+    val chainId = UUID.randomUUID().toString()
+
     fun getTotalWorks(): Int = blocks.flatMap { it.works }.size
 
     data class Block(

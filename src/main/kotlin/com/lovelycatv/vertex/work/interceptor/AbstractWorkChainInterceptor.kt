@@ -16,4 +16,6 @@ abstract class AbstractWorkChainInterceptor {
     abstract fun onBlockInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker)
 
     abstract fun onChainInterrupted(blockIndex: Int, block: WorkChain.Block, producer: WrappedWorker)
+
+    abstract fun onException(producer: WrappedWorker, e: Exception)
 }
