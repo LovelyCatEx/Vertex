@@ -4,6 +4,7 @@ import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.worker.WorkChain
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
 
 /**
  * @author lovelycat
@@ -15,6 +16,10 @@ class StartedWorkChain(
     private val workCoroutineScope: WorkCoroutineScope,
     private val workChainResult: Deferred<WorkData?>
 ) {
+    fun isRunning(): Boolean {
+        return this.chainCoroutineScope.isActive || this.workCoroutineScope.isActive
+    }
+
     suspend fun stop(reason: String = "") {
         this.chainCoroutineScope.cancel(reason)
         this.workCoroutineScope.stopCurrentWorks(reason)

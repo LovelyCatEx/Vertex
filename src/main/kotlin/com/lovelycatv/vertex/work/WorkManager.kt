@@ -23,6 +23,10 @@ import kotlin.coroutines.CoroutineContext
 class WorkManager {
     private val startedChains = mutableMapOf<String, StartedWorkChain>()
 
+    fun getRunningChains(): List<StartedWorkChain> {
+        return this.startedChains.filter { it.value.isRunning() }.values.toList()
+    }
+
     private fun requireEmptyWorkCoroutineScope(
         context: CoroutineContext,
         exceptionHandler: WorkExceptionHandler?
