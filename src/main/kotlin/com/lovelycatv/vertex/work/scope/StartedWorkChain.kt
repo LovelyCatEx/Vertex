@@ -17,7 +17,7 @@ class StartedWorkChain(
     private val workChainResult: Deferred<WorkData?>
 ) {
     fun isRunning(): Boolean {
-        return this.chainCoroutineScope.isActive || this.workCoroutineScope.isActive
+        return !this.workCoroutineScope.isAvailable()
     }
 
     suspend fun stop(reason: String = "") {
