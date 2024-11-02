@@ -12,6 +12,7 @@ data class WorkResult(
     val output: WorkData = WorkData.build(),
     val failedReason: String? = null,
     val stoppedReason: String? = null,
+    val errorMessage: String? = null,
     val exception: Exception? = null
 ) {
     fun isCompletedOrStopped() = this.state == WorkState.COMPLETED || this.state == WorkState.STOPPED
@@ -33,8 +34,8 @@ data class WorkResult(
             return WorkResult(WorkState.FAILED, output, failedReason = reason)
         }
 
-        fun error(e: Exception, output: WorkData = WorkData.build()): WorkResult {
-            return WorkResult(WorkState.ERROR, output, exception = e)
+        fun error(e: Exception, errorMessage: String = e.message ?: "", output: WorkData = WorkData.build()): WorkResult {
+            return WorkResult(WorkState.ERROR, output, exception = e, errorMessage = errorMessage)
         }
     }
 
