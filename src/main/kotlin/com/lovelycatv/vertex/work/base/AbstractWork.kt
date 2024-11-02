@@ -29,5 +29,5 @@ sealed class AbstractWork(
         job.cancel(reason)
     }
 
-    protected abstract suspend fun doWork(inputData: WorkData): WorkResult
+    protected abstract suspend fun doWork(preBlockOutputData: WorkData): WorkResult
 }

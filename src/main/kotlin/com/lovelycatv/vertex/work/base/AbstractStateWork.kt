@@ -31,7 +31,7 @@ sealed class AbstractStateWork(
                 postWorkResult(result)
                 result
             } catch (e: Exception) {
-                postWorkResult(WorkResult.error(e))
+                postWorkResult(WorkResult.error(e, e.message ?: e.localizedMessage ?: ""))
                 getCurrentWorkResult()
                 // Throw the exception to WorkCoroutineScope
                 throw e
