@@ -12,7 +12,9 @@ import java.util.UUID
 class WorkChain(val blocks: List<Block>) {
     val chainId = UUID.randomUUID().toString()
 
-    fun getTotalWorks(): Int = blocks.flatMap { it.works }.size
+    fun getWorksCount(): Int = getAllWorks().size
+
+    fun getAllWorks() = blocks.flatMap { it.works }
 
     data class Block(
         val works: List<WrappedWorker>,
