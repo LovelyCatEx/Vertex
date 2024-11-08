@@ -12,7 +12,6 @@ import com.lovelycatv.vertex.work.scope.WorkCoroutineScope
 import com.lovelycatv.vertex.work.scope.WorkExceptionHandler
 import com.lovelycatv.vertex.work.worker.WorkChain
 import kotlinx.coroutines.*
-import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -53,7 +52,7 @@ class WorkManager {
             }
         })
 
-        workCoroutineScope.initialize(workChain.getTotalWorks())
+        workCoroutineScope.initialize(workChain.getWorksCount())
 
         val scope = WorkChainCoroutineScope()
 
