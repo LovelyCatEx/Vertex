@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.extension
+package com.lovelycatv.vertex.math
 
 /**
  * @author lovelycat

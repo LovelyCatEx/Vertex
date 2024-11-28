@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.math.vector
 
-import com.lovelycatv.vertex.extension.dot
+import com.lovelycatv.vertex.math.linear.dot
 import kotlin.math.sqrt
 
 /**

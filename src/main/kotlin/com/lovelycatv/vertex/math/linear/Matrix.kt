@@ -1,8 +1,5 @@
 package com.lovelycatv.vertex.math.linear
 
-import com.lovelycatv.vertex.extension.dot
-import com.lovelycatv.vertex.extension.emptyDoubleArray
-
 /**
  * @author lovelycat
  * @since 2024-10-23 23:50
@@ -211,17 +208,19 @@ class Matrix {
     }
 
     override fun toString(): String {
-        var innerStr = ""
-        this.matrix.forEach { row ->
-            innerStr += "["
-            row.forEach { elementInRow ->
-                innerStr += "${elementInRow}, "
-            }
-            innerStr = innerStr.dropLast(2)
-            innerStr += "],\n"
+        return this.matrix.joinToString(
+            prefix = "[",
+            postfix = "]",
+            separator = ",\n ",
+            limit = 10
+        ) { row ->
+            row.joinToString(
+                prefix = "[",
+                postfix = "]",
+                separator = ", ",
+                limit = 10
+            )
         }
-        innerStr = innerStr.dropLast(2)
-        return "[${innerStr}]"
     }
 
     override fun equals(other: Any?): Boolean {

@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.extension
+package com.lovelycatv.vertex.math
 
 import com.lovelycatv.vertex.math.Complex
 

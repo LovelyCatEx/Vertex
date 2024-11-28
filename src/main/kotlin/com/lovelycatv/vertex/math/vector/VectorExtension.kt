@@ -1,6 +1,4 @@
-package com.lovelycatv.vertex.extension
-
-import com.lovelycatv.vertex.math.vector.*
+package com.lovelycatv.vertex.math.vector
 
 /**
  * @author lovelycat
