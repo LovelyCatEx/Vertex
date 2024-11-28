@@ -33,7 +33,7 @@ publishing {
             artifactId = "vertex"
             version = project.version.toString()
             pom {
-                name.set("Vertex")
+                name.set("vertex")
             }
         }
     }
