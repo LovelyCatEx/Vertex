@@ -32,7 +32,35 @@ class Int4: VertexNumber {
 
     override fun toString(): String = value.toString()
 
+    override fun compareTo(other: VertexNumber): Int {
+        return this.value - other.toInt()
+    }
+
     override fun toStringInRadix(radix: Int): String = this.value.toString(radix)
+
+    override fun toByte(): Byte {
+        return this.value
+    }
+
+    override fun toDouble(): Double {
+        return this.value.toDouble()
+    }
+
+    override fun toFloat(): Float {
+        return this.value.toFloat()
+    }
+
+    override fun toInt(): Int {
+        return this.value.toInt()
+    }
+
+    override fun toLong(): Long {
+        return this.value.toLong()
+    }
+
+    override fun toShort(): Short {
+        return this.value.toShort()
+    }
 
     operator fun plus(other: Int4): Int4 {
         return Int4(this.value + other.value)
