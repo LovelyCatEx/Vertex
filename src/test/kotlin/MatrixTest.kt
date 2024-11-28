@@ -1,7 +1,7 @@
-import com.lovelycatv.vertex.extension.filledMatrix
-import com.lovelycatv.vertex.extension.identityMatrix
-import com.lovelycatv.vertex.extension.toMatrix
-import com.lovelycatv.vertex.extension.zeroMatrix
+import com.lovelycatv.vertex.math.linear.filledMatrix
+import com.lovelycatv.vertex.math.linear.identityMatrix
+import com.lovelycatv.vertex.math.linear.toMatrix
+import com.lovelycatv.vertex.math.linear.zeroMatrix
 import com.lovelycatv.vertex.math.linear.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
