@@ -5,7 +5,7 @@ package com.lovelycatv.vertex.data.type.number
  * @since 2024-11-28 16:44
  * @version 1.0
  */
-class UInt8: VertexNumber {
+class UInt8: VertexUNumber {
     private var value: UByte
 
     constructor() {
@@ -28,7 +28,51 @@ class UInt8: VertexNumber {
 
     override fun toString(): String = value.toString()
 
+    override fun compareTo(other: VertexNumber): Int {
+        return this.toInt() - other.toInt()
+    }
+
+    override fun toUByte(): UByte {
+        return this.value.toUByte()
+    }
+
+    override fun toUShort(): UShort {
+        return this.value.toUShort()
+    }
+
+    override fun toUInt(): UInt {
+        return this.value.toUInt()
+    }
+
+    override fun toULong(): ULong {
+        return this.value.toULong()
+    }
+
     override fun toStringInRadix(radix: Int): String = this.value.toString(radix)
+
+    override fun toByte(): Byte {
+        return this.value.toByte()
+    }
+
+    override fun toDouble(): Double {
+        return this.value.toDouble()
+    }
+
+    override fun toFloat(): Float {
+        return this.value.toFloat()
+    }
+
+    override fun toInt(): Int {
+        return this.value.toInt()
+    }
+
+    override fun toLong(): Long {
+        return this.value.toLong()
+    }
+
+    override fun toShort(): Short {
+        return this.value.toShort()
+    }
 
     operator fun plus(other: UInt8): UInt8 {
         return UInt8((this.value + other.value).toUByte())

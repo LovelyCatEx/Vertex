@@ -11,14 +11,6 @@ import com.lovelycatv.vertex.math.linear.Matrix
  */
 class VArrayExtension private constructor()
 
-fun <T> Array<T>.toVArray(): VArray<T> {
-    return VArray(*this)
-}
-
-inline fun <reified T> VArray<T>.toArray(): Array<T> {
-    return Array(this.length) { this[it] }
-}
-
 inline fun <reified E> vertexArray(size: Int, init: (Int) -> E): VArray<E> {
     return VArray(*Array(size) { init.invoke(it) })
 }
@@ -75,8 +67,221 @@ fun vertexUShortArray(size: Int, init: (Int) -> UShort = { 0u }): VUShortArray {
 }
 
 /**
+ * For Iterable & VArray
+ */
+inline fun <reified T> Array<T>.toVArray(): VArray<T> {
+    return VArray(*this.toList().toTypedArray())
+}
+
+inline fun <reified T> Iterable<T>.toVArray(): VArray<T> {
+    return VArray(*this.toList().toTypedArray())
+}
+
+inline fun <reified T> Collection<T>.toVArray(): VArray<T> {
+    return VArray(*this.toTypedArray())
+}
+
+inline fun <reified T> VArray<T>.toArray(): Array<T> {
+    return Array(this.length) { this[it] }
+}
+
+fun <T> VArray<T>.toIterable(): Iterable<T> {
+    return this.elements.toList()
+}
+
+fun <T> VArray<T>.toList(): List<T> {
+    return this.elements.toList()
+}
+
+fun Array<Double>.toVDoubleArray(): VDoubleArray {
+    return VDoubleArray(*this.toDoubleArray())
+}
+
+fun Iterable<Double>.toVDoubleArray(): VDoubleArray {
+    return VDoubleArray(*this.toList().toDoubleArray())
+}
+
+fun Collection<Double>.toVDoubleArray(): VDoubleArray {
+    return VDoubleArray(*this.toDoubleArray())
+}
+
+fun VDoubleArray.toDoubleArray(): DoubleArray {
+    return this.doubleElements
+}
+
+fun Array<Float>.toVFloatArray(): VFloatArray {
+    return VFloatArray(*this.toFloatArray())
+}
+
+fun Iterable<Float>.toVFloatArray(): VFloatArray {
+    return VFloatArray(*this.toList().toFloatArray())
+}
+
+fun Collection<Float>.toVFloatArray(): VFloatArray {
+    return VFloatArray(*this.toFloatArray())
+}
+
+fun VFloatArray.toFloatArray(): FloatArray {
+    return this.floatElements
+}
+
+fun Array<Long>.toVLongArray(): VLongArray {
+    return VLongArray(*this.toLongArray())
+}
+
+fun Iterable<Long>.toVLongArray(): VLongArray {
+    return VLongArray(*this.toList().toLongArray())
+}
+
+fun Collection<Long>.toVLongArray(): VLongArray {
+    return VLongArray(*this.toLongArray())
+}
+
+fun VLongArray.toLongArray(): LongArray {
+    return this.longElements
+}
+
+fun Array<Int>.toVIntArray(): VIntArray {
+    return VIntArray(*this.toIntArray())
+}
+
+fun Iterable<Int>.toVIntArray(): VIntArray {
+    return VIntArray(*this.toList().toIntArray())
+}
+
+fun Collection<Int>.toVIntArray(): VIntArray {
+    return VIntArray(*this.toIntArray())
+}
+
+fun VIntArray.toIntArray(): IntArray {
+    return this.intElements
+}
+
+fun Array<Short>.toVShortArray(): VShortArray {
+    return VShortArray(*this.toShortArray())
+}
+
+fun Iterable<Short>.toVShortArray(): VShortArray {
+    return VShortArray(*this.toList().toShortArray())
+}
+
+fun Collection<Short>.toVShortArray(): VShortArray {
+    return VShortArray(*this.toShortArray())
+}
+
+fun VShortArray.toShortArray(): ShortArray {
+    return this.shortElements
+}
+
+fun Array<Byte>.toVByteArray(): VByteArray {
+    return VByteArray(*this.toByteArray())
+}
+
+fun Iterable<Byte>.toVByteArray(): VByteArray {
+    return VByteArray(*this.toList().toByteArray())
+}
+
+fun Collection<Byte>.toVByteArray(): VByteArray {
+    return VByteArray(*this.toByteArray())
+}
+
+fun VByteArray.toByteArray(): ByteArray {
+    return this.byteElements
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Array<ULong>.toVULongArray(): VULongArray {
+    return VULongArray(*this.toULongArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Iterable<ULong>.toVULongArray(): VULongArray {
+    return VULongArray(*this.toList().toULongArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Collection<ULong>.toVULongArray(): VULongArray {
+    return VULongArray(*this.toULongArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun VULongArray.toULongArray(): ULongArray {
+    return this.uLongElements
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Array<UInt>.toVUIntArray(): VUIntArray {
+    return VUIntArray(*this.toUIntArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Iterable<UInt>.toVUIntArray(): VUIntArray {
+    return VUIntArray(*this.toList().toUIntArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Collection<UInt>.toVUIntArray(): VUIntArray {
+    return VUIntArray(*this.toUIntArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun VUIntArray.toUIntArray(): UIntArray {
+    return this.uIntElements
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Array<UShort>.toVUShortArray(): VUShortArray {
+    return VUShortArray(*this.toUShortArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Iterable<UShort>.toVUShortArray(): VUShortArray {
+    return VUShortArray(*this.toList().toUShortArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Collection<UShort>.toVUShortArray(): VUShortArray {
+    return VUShortArray(*this.toUShortArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun VUShortArray.toUShortArray(): UShortArray {
+    return this.uShortElements
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Array<UByte>.toVUByteArray(): VUByteArray {
+    return VUByteArray(*this.toUByteArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Iterable<UByte>.toVUByteArray(): VUByteArray {
+    return VUByteArray(*this.toList().toUByteArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun Collection<UByte>.toVUByteArray(): VUByteArray {
+    return VUByteArray(*this.toUByteArray())
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun VUByteArray.toUByteArray(): UByteArray {
+    return this.uByteElements
+}
+
+
+/**
  * For VArray & Matrix
  */
+typealias VMatrix = VArray<VDoubleArray>
+
 fun VDoubleArray.toMatrix(): Matrix {
     return matrix(1, this.length) { _, j -> this[j] }
+}
+
+fun VMatrix.toMatrix(): Matrix {
+    val maxLength = this.elements.maxOf { it.length }
+    return matrix(this.length, maxLength) { i, j ->
+        if (j > this[i].length - 1) .0 else this[i][j]
+    }
 }

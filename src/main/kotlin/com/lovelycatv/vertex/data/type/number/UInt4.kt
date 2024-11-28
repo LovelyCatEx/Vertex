@@ -9,7 +9,7 @@ import kotlin.experimental.or
  * @since 2024-11-28 16:44
  * @version 1.0
  */
-class UInt4: VertexNumber {
+class UInt4: VertexUNumber {
     private var value: Byte
 
     constructor() {
@@ -32,7 +32,51 @@ class UInt4: VertexNumber {
 
     override fun toString(): String = value.toString()
 
+    override fun compareTo(other: VertexNumber): Int {
+        return this.value - other.toInt()
+    }
+
+    override fun toUByte(): UByte {
+        return this.value.toUByte()
+    }
+
+    override fun toUShort(): UShort {
+        return this.value.toUShort()
+    }
+
+    override fun toUInt(): UInt {
+        return this.value.toUInt()
+    }
+
+    override fun toULong(): ULong {
+        return this.value.toULong()
+    }
+
     override fun toStringInRadix(radix: Int): String = this.value.toString(radix)
+
+    override fun toByte(): Byte {
+        return this.value
+    }
+
+    override fun toDouble(): Double {
+        return this.value.toDouble()
+    }
+
+    override fun toFloat(): Float {
+        return this.value.toFloat()
+    }
+
+    override fun toInt(): Int {
+        return this.value.toInt()
+    }
+
+    override fun toLong(): Long {
+        return this.value.toLong()
+    }
+
+    override fun toShort(): Short {
+        return this.value.toShort()
+    }
 
     operator fun plus(other: UInt4): UInt4 {
         return UInt4(this.value + other.value)
