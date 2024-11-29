@@ -1,8 +1,5 @@
 package com.lovelycatv.vertex.math.linear
 
-import com.lovelycatv.vertex.extension.dot
-import com.lovelycatv.vertex.extension.emptyDoubleArray
-
 /**
  * @author lovelycat
  * @since 2024-10-23 23:50
@@ -10,6 +7,10 @@ import com.lovelycatv.vertex.extension.emptyDoubleArray
  */
 class Matrix {
     private val matrix: MutableList<DoubleArray> = mutableListOf()
+
+    val rows: List<DoubleArray> get() = this.matrix
+
+    val cols: List<DoubleArray> get() = (0..<this.getColumnCount()).map { getColumn(it) }
 
     constructor(rows: Int, cols: Int) {
         (0..<rows).forEach { _ ->
@@ -211,17 +212,19 @@ class Matrix {
     }
 
     override fun toString(): String {
-        var innerStr = ""
-        this.matrix.forEach { row ->
-            innerStr += "["
-            row.forEach { elementInRow ->
-                innerStr += "${elementInRow}, "
-            }
-            innerStr = innerStr.dropLast(2)
-            innerStr += "],\n"
+        return this.matrix.joinToString(
+            prefix = "[",
+            postfix = "]",
+            separator = ",\n ",
+            limit = 10
+        ) { row ->
+            row.joinToString(
+                prefix = "[",
+                postfix = "]",
+                separator = ", ",
+                limit = 10
+            )
         }
-        innerStr = innerStr.dropLast(2)
-        return "[${innerStr}]"
     }
 
     override fun equals(other: Any?): Boolean {
