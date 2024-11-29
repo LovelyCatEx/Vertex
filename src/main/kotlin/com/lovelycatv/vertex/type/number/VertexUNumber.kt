@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.data.type.number
+package com.lovelycatv.vertex.type.number
 
 /**
  * For unsigned custom number types

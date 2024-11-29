@@ -1,41 +1,37 @@
-package com.lovelycatv.vertex.data.type.number
-
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
+package com.lovelycatv.vertex.type.number
 
 /**
- * Packaged Byte value as UInt4
+ * Packaged Byte value as UInt8
  *
  * @author lovelycat
  * @since 2024-11-28 16:44
  * @version 1.0
  */
-class UInt4: VertexUNumber {
-    private var value: Byte
+class UInt8: VertexUNumber {
+    private var value: UByte
 
     constructor() {
-        this.value = 0
+        this.value = 0u
     }
 
-    constructor(value: Byte) {
-        this.value = normalize(value)
+    constructor(value: UByte) {
+        this.value = value
     }
 
     constructor(value: Number) {
-        this.value = normalize(value.toByte())
+        this.value = value.toInt().toUByte()
     }
 
-    fun getValue(): Byte = value
+    fun getValue(): UByte = value
 
-    fun setValue(newValue: Byte) {
-        value = normalize(newValue)
+    fun setValue(newValue: UByte) {
+        value = newValue
     }
 
     override fun toString(): String = value.toString()
 
     override fun compareTo(other: VertexNumber): Int {
-        return this.value - other.toInt()
+        return this.toInt() - other.toInt()
     }
 
     override fun toUByte(): UByte {
@@ -57,7 +53,7 @@ class UInt4: VertexUNumber {
     override fun toStringInRadix(radix: Int): String = this.value.toString(radix)
 
     override fun toByte(): Byte {
-        return this.value
+        return this.value.toByte()
     }
 
     override fun toDouble(): Double {
@@ -80,21 +76,21 @@ class UInt4: VertexUNumber {
         return this.value.toShort()
     }
 
-    operator fun plus(other: UInt4): UInt4 {
-        return UInt4(this.value + other.value)
+    operator fun plus(other: UInt8): UInt8 {
+        return UInt8((this.value + other.value).toUByte())
     }
 
-    operator fun minus(other: UInt4): UInt4 {
-        return UInt4(this.value - other.value)
+    operator fun minus(other: UInt8): UInt8 {
+        return UInt8((this.value - other.value).toUByte())
     }
 
-    operator fun times(other: UInt4): UInt4 {
-        return UInt4(this.value * other.value)
+    operator fun times(other: UInt8): UInt8 {
+        return UInt8((this.value * other.value).toUByte())
     }
 
-    operator fun div(other: UInt4): UInt4 {
+    operator fun div(other: UInt8): UInt8 {
         require(other.value.toInt() != 0) { "Division by zero" }
-        return UInt4(this.value / other.value)
+        return UInt8((this.value / other.value).toUByte())
     }
 
     operator fun get(index: Int): Boolean {
@@ -104,14 +100,10 @@ class UInt4: VertexUNumber {
 
     operator fun set(index: Int, value: Boolean) {
         require(index in 0..7) { "Index out of range: $index" }
-        val mask = (1 shl index).toByte()
+        val mask = (1 shl index).toUByte()
         this.value = if (value)
             this.value or mask
         else
             this.value and mask.inv()
-    }
-
-    private fun normalize(value: Byte): Byte {
-        return ((value.toUByte().toUInt() shl 4).toUByte().toUInt() shr 4).toByte()
     }
 }
