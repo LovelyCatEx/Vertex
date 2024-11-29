@@ -1,7 +1,7 @@
-import com.lovelycatv.vertex.math.linear.filledMatrix
-import com.lovelycatv.vertex.math.linear.identityMatrix
+import com.lovelycatv.vertex.math.linear.filledDoubleMatrix
+import com.lovelycatv.vertex.math.linear.identityDoubleMatrix
 import com.lovelycatv.vertex.math.linear.toMatrix
-import com.lovelycatv.vertex.math.linear.zeroMatrix
+import com.lovelycatv.vertex.math.linear.zeroDoubleMatrix
 import com.lovelycatv.vertex.math.linear.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
@@ -21,7 +21,7 @@ class MatrixTest {
             fromDoubleArray.getRowCount() == 1 && fromDoubleArray.getColumnCount() == 4 && fromDoubleArray[0].sum() == 4.0
         }
 
-        val zeroMatrix = zeroMatrix(4)
+        val zeroMatrix = zeroDoubleMatrix(4)
         println("2. Zero Matrix")
         println(zeroMatrix)
 
@@ -34,7 +34,7 @@ class MatrixTest {
             flag
         }
 
-        val identityMatrix = identityMatrix(4)
+        val identityMatrix = identityDoubleMatrix(4)
         println("3. Identity Matrix")
         println(identityMatrix)
 
@@ -50,7 +50,7 @@ class MatrixTest {
 
     @Test
     fun basicMatrixOperations() {
-        val a = Matrix(
+        val a = DoubleMatrix(
             doubleArrayOf(1.0, 4.5, 3.9, 3.0),
             doubleArrayOf(2.1, 2.8, 8.1, 2.5),
             doubleArrayOf(2.0, 5.0, 6.0, 1.0)
@@ -60,7 +60,7 @@ class MatrixTest {
         println("1. Delete Row 2")
         println(a.deleteRow(1))
         assertTrue("Calculation of deletion of row is incorrect") {
-            a.deleteRow(1) == Matrix(
+            a.deleteRow(1) == DoubleMatrix(
                 doubleArrayOf(1.0, 4.5, 3.9, 3.0),
                 doubleArrayOf(2.0, 5.0, 6.0, 1.0)
             )
@@ -69,7 +69,7 @@ class MatrixTest {
         println("2. Delete Column 3")
         println(a.deleteColumn(2))
         assertTrue("Calculation of deletion of column is incorrect") {
-            a.deleteColumn(2) == Matrix(
+            a.deleteColumn(2) == DoubleMatrix(
                 doubleArrayOf(1.0, 4.5, 3.0),
                 doubleArrayOf(2.1, 2.8, 2.5),
                 doubleArrayOf(2.0, 5.0, 1.0)
@@ -79,7 +79,7 @@ class MatrixTest {
         println("3. Transpose")
         println(a.transpose())
         assertTrue("Transpose of matrix is incorrect") {
-            a.transpose() == Matrix(
+            a.transpose() == DoubleMatrix(
                 doubleArrayOf(1.0, 2.1, 2.0),
                 doubleArrayOf(4.5, 2.8, 5.0),
                 doubleArrayOf(3.9, 8.1, 6.0),
@@ -90,12 +90,12 @@ class MatrixTest {
 
     @Test
     fun basicCalculation() {
-        val a = Matrix(
+        val a = DoubleMatrix(
             doubleArrayOf(1.0, 4.0),
             doubleArrayOf(2.0, 3.0)
         )
 
-        val b = Matrix(
+        val b = DoubleMatrix(
             doubleArrayOf(4.0, 1.0),
             doubleArrayOf(3.0, 2.0)
         )
@@ -109,13 +109,13 @@ class MatrixTest {
         val aPlusB = a + b
         println(aPlusB)
         assertTrue("a + b is incorrect") {
-            filledMatrix(2, 2,5.0) == aPlusB
+            filledDoubleMatrix(2, 2,5.0) == aPlusB
         }
 
         a += b
         println(a)
         assertTrue("a += b is incorrect") {
-            filledMatrix(2, 2,5.0) == aPlusB
+            filledDoubleMatrix(2, 2,5.0) == aPlusB
         }
 
 
@@ -124,7 +124,7 @@ class MatrixTest {
         a -= b
         println(a)
         assertTrue("a -= b is incorrect") {
-            a == Matrix(
+            a == DoubleMatrix(
                 doubleArrayOf(1.0, 4.0),
             doubleArrayOf(2.0, 3.0)
             )
@@ -133,7 +133,7 @@ class MatrixTest {
         val aMinB = a - b
         println(aMinB)
         assertTrue("a - b is incorrect") {
-            Matrix(
+            DoubleMatrix(
                 doubleArrayOf(-3.0, 3.0),
                 doubleArrayOf(-1.0, 1.0)
             ) == aMinB
@@ -143,7 +143,7 @@ class MatrixTest {
         val aTimesB = a * b
         println(aTimesB)
         assertTrue("a * b is incorrect") {
-            Matrix(
+            DoubleMatrix(
                 doubleArrayOf(16.0, 9.0),
                 doubleArrayOf(17.0, 8.0)
             ) == aTimesB
@@ -152,14 +152,14 @@ class MatrixTest {
         a *= b
         println(a)
         assertTrue("a *= b is incorrect") {
-            Matrix(
+            DoubleMatrix(
                 doubleArrayOf(16.0, 9.0),
                 doubleArrayOf(17.0, 8.0)
             ) == aTimesB
         }
 
         println("4. det(a), det(b)")
-        val c = Matrix(
+        val c = DoubleMatrix(
             doubleArrayOf(1.0, 2.0, 3.0),
             doubleArrayOf(2.0, 1.0, 3.0),
             doubleArrayOf(3.0, 2.0, 1.0)
