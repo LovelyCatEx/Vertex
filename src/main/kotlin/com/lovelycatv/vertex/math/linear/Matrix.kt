@@ -8,6 +8,10 @@ package com.lovelycatv.vertex.math.linear
 class Matrix {
     private val matrix: MutableList<DoubleArray> = mutableListOf()
 
+    val rows: List<DoubleArray> get() = this.matrix
+
+    val cols: List<DoubleArray> get() = (0..<this.getColumnCount()).map { getColumn(it) }
+
     constructor(rows: Int, cols: Int) {
         (0..<rows).forEach { _ ->
             matrix.add(emptyDoubleArray(cols))
