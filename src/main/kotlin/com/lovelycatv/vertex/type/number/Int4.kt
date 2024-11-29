@@ -1,17 +1,17 @@
-package com.lovelycatv.vertex.data.type.number
+package com.lovelycatv.vertex.type.number
 
 import kotlin.experimental.and
 import kotlin.experimental.inv
 import kotlin.experimental.or
 
 /**
- * Packaged Byte value as Int8
+ * Packaged Byte value as Int4
  *
  * @author lovelycat
  * @since 2024-11-28 16:44
  * @version 1.0
  */
-class Int8: VertexNumber {
+class Int4: VertexNumber {
     private var value: Byte
 
     constructor() {
@@ -19,17 +19,17 @@ class Int8: VertexNumber {
     }
 
     constructor(value: Byte) {
-        this.value = value
+        this.value = normalize(value)
     }
 
     constructor(value: Number) {
-        this.value = value.toByte()
+        this.value = normalize(value.toByte())
     }
 
     fun getValue(): Byte = value
 
     fun setValue(newValue: Byte) {
-        value = newValue
+        value = normalize(newValue)
     }
 
     override fun toString(): String = value.toString()
@@ -64,21 +64,21 @@ class Int8: VertexNumber {
         return this.value.toShort()
     }
 
-    operator fun plus(other: Int8): Int8 {
-        return Int8(this.value + other.value)
+    operator fun plus(other: Int4): Int4 {
+        return Int4(this.value + other.value)
     }
 
-    operator fun minus(other: Int8): Int8 {
-        return Int8(this.value - other.value)
+    operator fun minus(other: Int4): Int4 {
+        return Int4(this.value - other.value)
     }
 
-    operator fun times(other: Int8): Int8 {
-        return Int8(this.value * other.value)
+    operator fun times(other: Int4): Int4 {
+        return Int4(this.value * other.value)
     }
 
-    operator fun div(other: Int8): Int8 {
+    operator fun div(other: Int4): Int4 {
         require(other.value.toInt() != 0) { "Division by zero" }
-        return Int8(this.value / other.value)
+        return Int4(this.value / other.value)
     }
 
     operator fun get(index: Int): Boolean {
@@ -93,5 +93,17 @@ class Int8: VertexNumber {
             this.value or mask
         else
             this.value and mask.inv()
+    }
+
+    private fun normalize(value: Byte): Byte {
+        var t = when {
+            value > 7 -> (value - 16).toByte()
+            value < -8 -> (value + 16).toByte()
+            else -> value
+        }
+        while (t !in (-8..7)) {
+            t = normalize(t)
+        }
+        return t
     }
 }

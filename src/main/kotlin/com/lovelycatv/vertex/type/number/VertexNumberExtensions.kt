@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.data.type.number
+package com.lovelycatv.vertex.type.number
 
 /**
  * @author lovelycat
