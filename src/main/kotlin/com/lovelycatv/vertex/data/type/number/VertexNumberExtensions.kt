@@ -43,9 +43,13 @@ fun Int8.toUInt8(): UInt8 = UInt8(this.getValue())
 
 fun Int8.toInt4(): Int4 = Int4(this.getValue())
 
+fun Int8.toInt(): Int = this.getValue().toInt()
+
 fun Int4.toUInt4(): UInt4 = UInt4(this.getValue())
 
 fun Int4.toInt8(): Int8 = Int8(this.getValue())
+
+fun Int4.toInt(): Int = this.getValue().toInt()
 
 fun UInt8.toUInt4(): UInt4 = UInt4(this.getValue().toByte())
 
