@@ -47,11 +47,6 @@ fun identityMatrix(n: Int): Matrix {
     )
 }
 
-fun main() {
-    val a = randomMatrix(15, 15)
-    println(a)
-}
-
 fun DoubleArray.toMatrix(): Matrix = Matrix(this)
 
 infix fun DoubleArray.dot(other: DoubleArray): Double {

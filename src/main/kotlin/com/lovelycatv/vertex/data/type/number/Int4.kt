@@ -5,6 +5,8 @@ import kotlin.experimental.inv
 import kotlin.experimental.or
 
 /**
+ * Packaged Byte value as Int4
+ *
  * @author lovelycat
  * @since 2024-11-28 16:44
  * @version 1.0

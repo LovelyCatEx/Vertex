@@ -1,6 +1,8 @@
 package com.lovelycatv.vertex.data.type.number
 
 /**
+ * Packaged Byte value as UInt8
+ *
  * @author lovelycat
  * @since 2024-11-28 16:44
  * @version 1.0
